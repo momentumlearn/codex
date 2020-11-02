@@ -210,3 +210,11 @@ digraph {
 <Graphviz dot={photos4} options={{width: 800}} />
 
 Note the `gallery_member` table. It looks like a join table, and it does serve as one, but it has extra data (`is_owner`). This is represented differently in Django (a ManyToManyField for `gallery_photos` and a GalleryMember model with two ForeignKeys for `gallery_member`).
+
+## Rules to follow in modeling
+
+There's a few rules that you have to keep in mind in order to model well.
+
+- Don't use multiple columns to store the same sort of thing. For example, no fields called `category1`, `category2`, etc. Two foreign keys to the same table are fine if they represent different things.
+- Move repeating data to its own table. For example, a `category` field shouldn't be a string field with the same 10 categories used over and over. Make a category table and use a foreign key.
+- Don't store derived data in the database. For example, if you were storing people for a car rental application, you wouldn't have a `birthday` field and a `over_25` field. You would calculate if someone was over 25 by using their birthday.

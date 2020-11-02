@@ -23,3 +23,7 @@ Besides a field type, each field has some options that might be set:
 - *NULL* - this field is allowed to be null, or have nothing in it
 - *NOT NULL* - this field isn't allowed to be null. This is the default and assumed.
 - *DEFAULT* - this field has a default value if it's not explicitly set
+
+## The primary key field
+
+The primary key that we've seen so far is a special field. In all our examples, it's called `id` and is an integer. Neither of these are a requirement, but we will continue to use them. When Django creates a table, it makes an `id` column that is assigned an auto-incrementing number when a new record is inserted into the table. We will use this default.
