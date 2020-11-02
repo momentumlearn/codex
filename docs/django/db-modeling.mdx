@@ -1,5 +1,5 @@
 ---
-title: Database Modeling
+title: Database modeling
 ---
 
 import { Graphviz } from 'graphviz-react'
@@ -185,8 +185,8 @@ digraph {
 <table border="0" cellborder="1" cellspacing="0">
 <tr><td><i>gallery_member</i></td></tr>
 <tr><td port="id"><b>PK </b> id int</td></tr>
-<tr><td port="user_id"><b>FK </b> user_id int</td></tr>
 <tr><td port="gallery_id"><b>FK </b> gallery_id int</td></tr>
+<tr><td port="user_id"><b>FK </b> user_id int</td></tr>
 <tr><td>is_owner bool DEFAULT false</td></tr>
 </table>
   >];
@@ -199,7 +199,6 @@ digraph {
 </table>
   >];
   photo:user_id -> user:id;
-  gallery:user_id -> user:id;
   gallery_photos:gallery_id -> gallery:id [label="M2M to photo"];
   gallery_photos:photo_id -> photo:id [label="M2M to gallery"];
   gallery_member:gallery_id -> gallery:id;
