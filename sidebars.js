@@ -4,7 +4,10 @@ module.exports = {
     Django: [
       'django/intro',
       'django/databases',
-      'django/db-relationships'
+      'django/db-fields',
+      'django/db-relationships',
+      'django/db-diagrams',
+      'django/db-modeling'
     ]
     // Setup: ['setup/mac', 'setup/windows', 'setup/chromebook', 'setup/complete'],
     // HTML: [

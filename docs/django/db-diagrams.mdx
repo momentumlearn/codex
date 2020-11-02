@@ -1,9 +1,21 @@
+---
+title: Database diagrams
+---
+
+import { Graphviz } from 'graphviz-react'
+
+One way we can represent a database is by using a diagram. These look like a set of tables (HTML-style tables, not database tables) containing the database table name and all of its fields, with lines connecting tables by their foreign keys. The "many"-side of the relationship is represented by three small lines (it looks kind of like a bird's foot.) Many-to-many relationships are less obvious this way as both foreign keys from the join table, so you can show them with a label on the connection. (There are other ways to represent this with more advanced drawing techniques, but we're keeping it simple.)
+
+## A photo gallery application
+
+Below we have an example of the database for a photo gallery application. In this application, photos are allowed to be in multiple galleries.
+
+export const photo1 = `
 digraph {
   graph [pad="0.5", nodesep="0.5", ranksep="2", fontname="Helvetica"];
   node [shape=plain, fontname="Helvetica"]
   edge [fontname="Helvetica", dir="back", arrowtail="crow", tail_lp="20,20"]
   rankdir=RL;
-
   user [label=<
 <table border="0" cellborder="1" cellspacing="0">
 <tr><td><i>user</i></td></tr>
@@ -13,16 +25,16 @@ digraph {
 <tr><td>is_admin bool</td></tr>
 </table>
   >];
-
   photo [label=<
 <table border="0" cellborder="1" cellspacing="0">
 <tr><td port="title"><i>photo</i></td></tr>
 <tr><td port="id"><b>PK </b> id int</td></tr>
 <tr><td port="user_id"><b>FK </b>user_id int</td></tr>
 <tr><td>filename string</td></tr>
+<tr><td>caption string</td></tr>
+<tr><td>alt_text string</td></tr>
 </table>
   >];
-
   gallery [label=<
 <table border="0" cellborder="1" cellspacing="0">
 <tr><td port="title"><i>gallery</i></td></tr>
@@ -30,7 +42,6 @@ digraph {
 <tr><td>name string</td></tr>
 </table>
   >];
-
   gallery_photos [label=<
 <table border="0" cellborder="1" cellspacing="0">
 <tr><td><i>gallery_photos</i></td></tr>
@@ -39,18 +50,11 @@ digraph {
 <tr><td port="photo_id"><b>FK </b> photo_id int</td></tr>
 </table>
   >];
-
-
-
-  // { rank = same; photo; gallery }
-  // { rank = same; gallery_photos }
-  // gallery_photos_join [width=0, shape="point"];
   photo:user_id -> user:id;
   gallery_photos:gallery_id -> gallery:id [label="M2M to photo"];
   gallery_photos:photo_id -> photo:id [label="M2M to gallery"];
-  // gallery:title -> photo:title [dir="both", arrowhead="crow", style="dashed"]
-  // gallery:title -> gallery_photos_join;
-  // photo:title -> gallery_photos_join;
-  // gallery_photos_join -> gallery_photos [dir="none", style="dashed"];
-
 }
+`
+
+<Graphviz dot={photo1} options={{width: 800}} />
+

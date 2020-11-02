@@ -1,0 +1,212 @@
+---
+title: Database Modeling
+---
+
+import { Graphviz } from 'graphviz-react'
+
+One of the most important exercises you can do to improve your development skills is to model out the data behind an application. When you do this, you first describe the application as you might use it. Then you try to identify every table you would need to store the data and the relationships between those tables.
+
+The most difficult part of this is handling the translation from how we think about problems as humans into two-dimensional tables. As you do this, you'll have to break down each collection of like data into its own table. You will likely encounter questions along the way that you'll have to answer to move forward.
+
+## Photo gallery app example
+
+For example, let's imagine a photo gallery application. In its simplest form, registered users can upload photos. The design of this is very simple.
+
+export const photos1 = `
+digraph {
+  graph [pad="0.5", nodesep="0.5", ranksep="2", fontname="Helvetica"];
+  node [shape=plain, fontname="Helvetica"]
+  edge [fontname="Helvetica", dir="back", arrowtail="crow", tail_lp="20,20"]
+  rankdir=RL;
+  user [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td><i>user</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td>username string UNIQUE</td></tr>
+<tr><td>email string UNIQUE</td></tr>
+<tr><td>is_admin bool</td></tr>
+</table>
+  >];
+  photo [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td port="title"><i>photo</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td port="user_id"><b>FK </b>user_id int</td></tr>
+<tr><td>filename string</td></tr>
+<tr><td>caption string NULL</td></tr>
+<tr><td>alt_text string</td></tr>
+</table>
+  >];
+  photo:user_id -> user:id;
+}
+`
+
+<Graphviz dot={photos1} options={{width: 600}} />
+
+Users will want to put photos into galleries. When you run into this part, you will have to decide: can a photo only be in one gallery, or can a photo be in multiple galleries? This choice will affect the database significantly.
+
+### Database with photos in one and only one gallery
+
+export const photos2 = `
+digraph {
+  graph [pad="0.5", nodesep="0.5", ranksep="2", fontname="Helvetica"];
+  node [shape=plain, fontname="Helvetica"]
+  edge [fontname="Helvetica", dir="back", arrowtail="crow", tail_lp="20,20"]
+  rankdir=RL;
+  user [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td><i>user</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td>username string UNIQUE</td></tr>
+<tr><td>email string UNIQUE</td></tr>
+<tr><td>is_admin bool</td></tr>
+</table>
+  >];
+  photo [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td port="title"><i>photo</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td port="user_id"><b>FK </b>user_id int</td></tr>
+<tr><td port="gallery_id"><b>FK </b>gallery_id int</td></tr>
+<tr><td>filename string</td></tr>
+<tr><td>caption string NULL</td></tr>
+<tr><td>alt_text string</td></tr>
+</table>
+  >];
+  gallery [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td port="title"><i>gallery</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td port="user_id"><b>FK </b>user_id int</td></tr>
+<tr><td>name string</td></tr>
+</table>
+  >];
+  photo:user_id -> user:id;
+  photo:gallery_id -> gallery:id;
+  gallery:user_id -> user:id;
+}
+`
+
+<Graphviz dot={photos2} options={{width: 800}} />
+
+Since photos are only in one gallery, a simple foreign key from `photo` to `gallery` will suffice.
+
+### Database with photos in multiple galleries
+
+export const photos3 = `
+digraph {
+  graph [pad="0.5", nodesep="0.5", ranksep="2", fontname="Helvetica"];
+  node [shape=plain, fontname="Helvetica"]
+  edge [fontname="Helvetica", dir="back", arrowtail="crow", tail_lp="20,20"]
+  rankdir=RL;
+  user [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td><i>user</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td>username string UNIQUE</td></tr>
+<tr><td>email string UNIQUE</td></tr>
+<tr><td>is_admin bool</td></tr>
+</table>
+  >];
+  photo [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td port="title"><i>photo</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td port="user_id"><b>FK </b>user_id int</td></tr>
+<tr><td>filename string</td></tr>
+<tr><td>caption string NULL</td></tr>
+<tr><td>alt_text string</td></tr>
+</table>
+  >];
+  gallery [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td port="title"><i>gallery</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td port="user_id"><b>FK </b>user_id int</td></tr>
+<tr><td>name string</td></tr>
+</table>
+  >];
+  gallery_photos [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td><i>gallery_photos</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td port="gallery_id"><b>FK </b> gallery_id int</td></tr>
+<tr><td port="photo_id"><b>FK </b> photo_id int</td></tr>
+</table>
+  >];
+  photo:user_id -> user:id;
+  gallery:user_id -> user:id;
+  gallery_photos:gallery_id -> gallery:id [label="M2M to photo"];
+  gallery_photos:photo_id -> photo:id [label="M2M to gallery"];
+}
+`
+
+<Graphviz dot={photos3} options={{width: 800}} />
+
+To allow photos to be in multiple galleries, we needed to add a join table, `gallery_photos`.
+
+This example remains quite simple. Imagine if multiple users had permission to add photos to galleries. Each gallery would have an owner that added and removed people from the gallery (or they might even have multiple owners!) Here's one example of what that might look like.
+
+### Database with photos in multiple galleries and multiple users per gallery
+
+export const photos4 = `
+digraph {
+  graph [pad="0.5", nodesep="0.5", ranksep="2", fontname="Helvetica"];
+  node [shape=plain, fontname="Helvetica"]
+  edge [fontname="Helvetica", dir="back", arrowtail="crow", tail_lp="20,20"]
+  rankdir=RL;
+  user [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td><i>user</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td>username string UNIQUE</td></tr>
+<tr><td>email string UNIQUE</td></tr>
+<tr><td>is_admin bool</td></tr>
+</table>
+  >];
+  photo [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td port="title"><i>photo</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td port="user_id"><b>FK </b>user_id int</td></tr>
+<tr><td>filename string</td></tr>
+<tr><td>caption string NULL</td></tr>
+<tr><td>alt_text string</td></tr>
+</table>
+  >];
+  gallery [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td port="title"><i>gallery</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td>name string</td></tr>
+</table>
+  >];
+  gallery_member [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td><i>gallery_member</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td port="user_id"><b>FK </b> user_id int</td></tr>
+<tr><td port="gallery_id"><b>FK </b> gallery_id int</td></tr>
+<tr><td>is_owner bool DEFAULT false</td></tr>
+</table>
+  >];
+  gallery_photos [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td><i>gallery_photos</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td port="photo_id"><b>FK </b> photo_id int</td></tr>
+<tr><td port="gallery_id"><b>FK </b> gallery_id int</td></tr>
+</table>
+  >];
+  photo:user_id -> user:id;
+  gallery:user_id -> user:id;
+  gallery_photos:gallery_id -> gallery:id [label="M2M to photo"];
+  gallery_photos:photo_id -> photo:id [label="M2M to gallery"];
+  gallery_member:gallery_id -> gallery:id;
+  gallery_member:user_id -> user:id;
+}
+`
+
+<Graphviz dot={photos4} options={{width: 800}} />
+
+Note the `gallery_member` table. It looks like a join table, and it does serve as one, but it has extra data (`is_owner`). This is represented differently in Django (a ManyToManyField for `gallery_photos` and a GalleryMember model with two ForeignKeys for `gallery_member`).
