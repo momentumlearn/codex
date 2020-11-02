@@ -1,0 +1,148 @@
+---
+title: Database relationships
+---
+
+import { Graphviz } from 'graphviz-react'
+
+When we use a foreign key to link rows between tables, we form a database relationship. These relationships come in three types, many-to-one, one-to-one, and many-to-many.
+
+## Many-to-one
+
+When you add a foreign key to a table, you are allowing many rows of that table to relate to one row from another table.
+
+- If `photo` has a foreign key to `user`, many photos can be added by a user.
+- If `message` has a foreign key `from_id` to `user`, many messages can be sent by a user.
+- If `message` has a foreign key `to_id` to `user`, many messages can be sent to a user.
+- If `part` has a foreign key to `manufacturer`, many parts can be made by a manufacturer.
+- If `answer` has a foreign key to `question`, there can be many answers to a question.
+
+This is also referred to as a _belongs-to_ relationship, as in "an answer belongs to a question."
+
+This relationship works both ways. Given a question, you can find its answers; given an answer, you can find its question. From the viewpoint of the question, this is a _one-to-many_ or _has-many_ relationship, as in "a question has many answers."
+
+## One-to-one
+
+A one-to-one relationship also uses a foreign key, but adds a constraint that the foreign key value must be unique. Each row of the parent table can only be referenced once. This is extremely rare in practice. There are very few problems this can solve that are not better solved by adding more fields to the parent table.
+
+## Many-to-many
+
+Some relationships are not naturally parent-to-child, but instead an interrelated web between two different types of things. Here are some examples:
+
+- For a magazine site, articles can be in multiple categories and each category has multiple articles in it.
+- For a photo sharing site, each gallery can have multiple photos in it and each photo can be in multiple galleries.
+- For a time-tracking app, each employee can be assigned to multiple projects and each project can have multiple employees on it.
+
+These _many-to-many_ relationships also use foreign keys, but not directly between the related tables. Instead, a third table is used. This _join table_ has foreign keys to both related models. Let's see an example of how this works.
+
+## Gallery example
+
+### `photo` table
+
+| id | user_id | filename       |
+|----|---------|----------------|
+| 1  | 1       | profile.jpg    |
+| 2  | 1       | two-cats.png   |
+| 3  | 3       | jumanji.jpg    |
+| 4  | 2       | bat-colony.jpg |
+
+### `gallery` table
+
+| id | name    |
+|----|---------|
+| 1  | Animals |
+| 2  | Movies  |
+
+### `gallery_photos` table (join table)
+
+| id | photo_id | gallery_id |
+|----|----------|------------|
+| 1  | 2        | 1          |
+| 2  | 3        | 1          |
+| 3  | 4        | 1          |
+| 4  | 3        | 2          |
+
+Looking at the `gallery_photos` table, you can see that there are foreign keys to `photo` and `gallery`.
+
+- Photo 1 is not in any galleries.
+- Photo 2 is in gallery 1.
+- Photo 3 is in galleries 1 and 2.
+- Photo 4 is in gallery 1.
+- Gallery 1 contains photos 2, 3, and 4.
+- Gallery 2 contains photo 3.
+
+## Database diagrams
+
+One way we can represent a database is by using a diagram. These look like a set of tables (HTML-style tables, not database tables) containing the database table name and all of its fields, with lines connecting tables by their foreign keys. The "many"-side of the relationship is represented by three small lines (it looks kind of like a bird's foot.) Many-to-many relationships are less obvious this way as both foreign keys from the join table, so you can show them with a label on the connection. (There are other ways to represent this with more advanced drawing techniques, but we're keeping it simple.)
+
+export const graph1 = `
+digraph {
+  graph [pad="0.5", nodesep="0.5", ranksep="2"];
+  node [shape=plain]
+  rankdir=LR;
+  user [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td><i>user</i></td></tr>
+<tr><td port="id"><b>id int PK</b></td></tr>
+<tr><td>username string UNIQUE</td></tr>
+<tr><td>email string UNIQUE</td></tr>
+<tr><td>is_admin bool</td></tr>
+</table>
+  >];
+  photo [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td><i>photo</i></td></tr>
+<tr><td port="id"><b>id int PK</b></td></tr>
+<tr><td port="user_id">user_id int FK</td></tr>
+<tr><td>filename string</td></tr>
+</table>
+  >];
+  photo:user_id -> user:id
+}
+`
+
+export const db1 = `
+digraph {
+  graph [pad="0.5", nodesep="0.5", ranksep="2", fontname="Helvetica"];
+  node [shape=plain, fontname="Helvetica"]
+  edge [fontname="Helvetica", dir="back", arrowtail="crow", tail_lp="20,20"]
+  rankdir=RL;
+  user [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td><i>user</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td>username string UNIQUE</td></tr>
+<tr><td>email string UNIQUE</td></tr>
+<tr><td>is_admin bool</td></tr>
+</table>
+  >];
+  photo [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td port="title"><i>photo</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td port="user_id"><b>FK </b>user_id int</td></tr>
+<tr><td>filename string</td></tr>
+</table>
+  >];
+  gallery [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td port="title"><i>gallery</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td>name string</td></tr>
+</table>
+  >];
+  gallery_photos [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td><i>gallery_photos</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td port="gallery_id"><b>FK </b> gallery_id int</td></tr>
+<tr><td port="photo_id"><b>FK </b> photo_id int</td></tr>
+</table>
+  >];
+  photo:user_id -> user:id;
+  gallery_photos:gallery_id -> gallery:id [label="M2M to photo"];
+  gallery_photos:photo_id -> photo:id [label="M2M to gallery"];
+}
+`
+
+<Graphviz dot={db1} options={{width: 800}} />
+

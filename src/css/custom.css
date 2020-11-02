@@ -1,0 +1,81 @@
+/* stylelint-disable docusaurus/copyright-header */
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary: #1a0a6e;
+  --ifm-color-primary-dark: #170963;
+  --ifm-color-primary-darker: #16085e;
+  --ifm-color-primary-darkest: #12074d;
+  --ifm-color-primary-light: #1d0b79;
+  --ifm-color-primary-lighter: #1e0b7f;
+  --ifm-color-primary-lightest: #220d8f;
+  --ifm-code-font-size: 95%;
+  --color-sky: #5CC8D8;
+  --color-royal: #1A0A6E;
+  --color-branch: #1DA57E;
+  --color-violet: #6E56B1;
+  --color-ruby: #E95D68;
+  --color-terminal: #090326;
+}
+
+.footer--dark {
+  --ifm-footer-background-color: #090326;
+  --ifm-footer-link-hover-color: #5cc8d8;
+}
+
+[data-theme='dark'] .hero {
+  --ifm-hero-text-color: var(--ifm-heading-color);
+}
+
+.docusaurus-highlight-code-line {
+  background-color: rgb(72, 77, 91);
+  display: block;
+  margin: 0 calc(-1 * var(--ifm-pre-padding));
+  padding: 0 var(--ifm-pre-padding);
+}
+
+.codeline {
+  padding: 0.25rem;
+  margin: 0.25rem;
+}
+
+.codeline:hover {
+  padding: calc(0.25rem - 1px);
+  border: 1px solid var(--ifm-color-primary);
+}
+
+.ParsonsProblem .correct {
+  background-color: #1da57e77;
+  color: white;
+}
+
+.ParsonsProblem .incorrect {
+  background-color: #e95d6977;
+  color: white;
+}
+
+.Sandbox {
+  border: 1px solid #5cc8d8;
+  padding: 5px;
+  margin-bottom: 2rem;
+}
+
+.Sandbox .tabs__item {
+  padding: 0.25rem 1rem;
+}
+
+.Sandbox__panel {
+  height: 100%;
+}
+
+.alert--info {
+  --ra-admonition-icon-color: var(--color-terminal);
+  --ifm-alert-color: var(--color-terminal);
+  --ifm-alert-background-color: var(--color-sky);
+  --ifm-alert-border-color: var(--color-sky);
+}

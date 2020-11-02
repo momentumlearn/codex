@@ -1,0 +1,56 @@
+digraph {
+  graph [pad="0.5", nodesep="0.5", ranksep="2", fontname="Helvetica"];
+  node [shape=plain, fontname="Helvetica"]
+  edge [fontname="Helvetica", dir="back", arrowtail="crow", tail_lp="20,20"]
+  rankdir=RL;
+
+  user [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td><i>user</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td>username string UNIQUE</td></tr>
+<tr><td>email string UNIQUE</td></tr>
+<tr><td>is_admin bool</td></tr>
+</table>
+  >];
+
+  photo [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td port="title"><i>photo</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td port="user_id"><b>FK </b>user_id int</td></tr>
+<tr><td>filename string</td></tr>
+</table>
+  >];
+
+  gallery [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td port="title"><i>gallery</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td>name string</td></tr>
+</table>
+  >];
+
+  gallery_photos [label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td><i>gallery_photos</i></td></tr>
+<tr><td port="id"><b>PK </b> id int</td></tr>
+<tr><td port="gallery_id"><b>FK </b> gallery_id int</td></tr>
+<tr><td port="photo_id"><b>FK </b> photo_id int</td></tr>
+</table>
+  >];
+
+
+
+  // { rank = same; photo; gallery }
+  // { rank = same; gallery_photos }
+  // gallery_photos_join [width=0, shape="point"];
+  photo:user_id -> user:id;
+  gallery_photos:gallery_id -> gallery:id [label="M2M to photo"];
+  gallery_photos:photo_id -> photo:id [label="M2M to gallery"];
+  // gallery:title -> photo:title [dir="both", arrowhead="crow", style="dashed"]
+  // gallery:title -> gallery_photos_join;
+  // photo:title -> gallery_photos_join;
+  // gallery_photos_join -> gallery_photos [dir="none", style="dashed"];
+
+}
